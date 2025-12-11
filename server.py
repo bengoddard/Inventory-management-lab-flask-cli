@@ -1,12 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from lib.utils import load_data, save_data, fetch_inventory
+
 
 app = Flask(__name__)
 
-inventory = [
-    {"id": 1, "title": "Bread"},
-    {"id": 2, "title": "Peanut Butter"}
-]
+inventory = load_data()
 
 @app.route("/inventory", methods=["GET"])
 def welcome():
@@ -17,8 +16,7 @@ def display(id):
     for i in inventory:
         if i["id"] == id:
             return jsonify(i), 200
-        else:
-            return ("Item not found")
+    return ("Item not found")
 
 
 @app.route("/inventory", methods=["POST"])
