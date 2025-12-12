@@ -1,1 +1,9 @@
 This is an inventory management app. You can interact with it through the CLI. 
+
+The CLI commands are -
+add-item "name" "price" "stock"
+display-inventory
+display-item "id"
+update-item "id" "new_price" "new_stock"
+delete-item "id"
+find-item "barcode"
