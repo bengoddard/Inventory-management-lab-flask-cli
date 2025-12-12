@@ -5,6 +5,28 @@ import requests
 DATA_FILE = "data.json"
 URL = "http://127.0.0.1:5000/inventory"
 
+def load_data():
+    if not os.path.exists(DATA_FILE) or os.path.getsize(DATA_FILE) == 0:
+        return []
+    try:
+        with open(DATA_FILE, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+    except json.JSONDecodeError:
+        print(f"Warning: {DATA_FILE} contains invalid JSON. Returning empty list.")
+        return []
+
+def save_data(data):
+    try:
+        with open(DATA_FILE, 'w') as f:
+            json.dump(data, f, indent=4)
+    except IOError as e:
+        print(f"Error saving data to {DATA_FILE}: {e}")
+
+
+inventory = load_data()
+
 def welcome_cli(args):
     try:
         response = requests.get(URL)
@@ -39,6 +61,8 @@ def add_item_cli(args):
     try:
         response = requests.post(URL, json=data)
         new_item = response.json()
+        inventory.append(new_item)
+        save_data(inventory)
         print(f"Item added successfully via API: {args.name}")
     except requests.exceptions.RequestException as e:
         print(f"ERROR: Failed to communicate with server at {URL}. Is the server running?")
@@ -81,29 +105,17 @@ def fetch_inventory_cli(args):
     try:
         response = requests.post(url)
         new_item = response.json()
+        new_id = max((i["id"] for i in inventory), default=0) + 1
+        add_item = {
+            "id": new_id,
+            "name": new_item["product"]["product_name"],
+            "grade": new_item['product']['nutriscore_data']['grade']
+            }
+        inventory.append(add_item)
+        save_data(inventory)
         print(f"SUCCESS: Server fetched and added item.")
         print(f"Name: {new_item['product']['product_name']}, Grade: {new_item['product']['nutriscore_data']['grade']}")
     except requests.exceptions.HTTPError as e:
         print("Server failed to fetch product from external API.")
     except requests.exceptions.RequestException as e:
         print(f"ERROR: Failed to connect to server: {e}")
-
-
-
-
-def load_data():
-    if not os.path.exists(DATA_FILE) or os.path.getsize(DATA_FILE) == 0:
-        return []
-    try:
-        with open(DATA_FILE, 'r') as f:
-            return json.load(f)
-    except json.JSONDecodeError:
-        print(f"Warning: {DATA_FILE} contains invalid JSON. Returning empty list.")
-        return []
-
-def save_data(data):
-    try:
-        with open(DATA_FILE, 'w') as f:
-            json.dump(data, f, indent=4)
-    except IOError as e:
-        print(f"Error saving data to {DATA_FILE}: {e}")

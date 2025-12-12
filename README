@@ -1,6 +1,10 @@
-This is an inventory management app. You can interact with it through the CLI. 
+This is an inventory management app. You can interact with it through the CLI.
 
 You can run the server by running python lib/server.py in the cmd line
+You can start the CLI by running python main.py in the cmd line
+
+CLI command format - 'python main.py command arguements'
+example - python main.py add-item celery 3 20
 
 The CLI commands are -
 add-item "name" "price" "stock"
