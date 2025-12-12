@@ -13,15 +13,13 @@
     },
     {
         "id": 3,
-        "name": "Nutella",
-        "grade": "e",
-        "price": "5",
-        "stock": "10"
+        "name": "TestItem",
+        "price": 10.0,
+        "stock": 100
     },
     {
         "id": 4,
-        "name": "celery",
-        "price": "3",
-        "stock": "20"
+        "name": "Nutella",
+        "grade": "e"
     }
 ]
