@@ -3,24 +3,12 @@
         "id": 1,
         "name": "Bread",
         "price": 5,
-        "instock": 10
+        "stock": 10
     },
     {
         "id": 2,
         "name": "Peanut Butter",
         "price": 3,
-        "instock": 5
-    },
-    {
-        "id": 4,
-        "name": "Jelly",
-        "price": 2,
-        "instock": 10
-    },
-    {
-        "id": 5,
-        "name": "test",
-        "price": "20",
-        "stock": "5"
+        "stock": 5
     }
 ]
