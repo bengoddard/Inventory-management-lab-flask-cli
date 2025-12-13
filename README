@@ -1,6 +1,6 @@
 This is an inventory management app. You can interact with it through the CLI.
 
-You can run the server by running python lib/server.py in the cmd line
+You can run the server by running python -m lib.server in the cmd line
 You can start the CLI by running python main.py in the cmd line
 
 CLI command format - 'python main.py command arguements'
