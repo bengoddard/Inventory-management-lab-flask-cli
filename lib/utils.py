@@ -103,19 +103,31 @@ def delete_item_cli(args):
 def fetch_inventory_cli(args):
     url = f"https://world.openfoodfacts.net/api/v2/product/{args.barcode}?fields=product_name,nutriscore_data"
     try:
-        response = requests.post(url)
+        response = requests.get(url)
+        response.raise_for_status()
         new_item = response.json()
+        if 'product' not in new_item or new_item.get('status', 0) == 0:
+             raise requests.exceptions.HTTPError(
+                 '404 Client Error: Not Found for URL: Barcode not found in Open Food Facts API.',
+                 response=response
+             )
         new_id = max((i["id"] for i in inventory), default=0) + 1
+        price = 5
+        stock = 10
         add_item = {
             "id": new_id,
             "name": new_item["product"]["product_name"],
-            "grade": new_item['product']['nutriscore_data']['grade']
+            "price": price,
+            "stock": stock
             }
         inventory.append(add_item)
         save_data(inventory)
         print(f"SUCCESS: Server fetched and added item.")
         print(f"Name: {new_item['product']['product_name']}, Grade: {new_item['product']['nutriscore_data']['grade']}")
     except requests.exceptions.HTTPError as e:
-        print("Server failed to fetch product from external API.")
+        if e.response.status_code == 404 or "Barcode not found" in str(e):
+            print(f"ERROR: Barcode '{args.barcode}' not found in the external API.")
+        else:
+            print(f"Server failed to fetch product from external API. Status: {e.response.status_code}")
     except requests.exceptions.RequestException as e:
-        print(f"ERROR: Failed to connect to server: {e}")
+        print(f"ERROR: Failed to connect to external API: {e}")

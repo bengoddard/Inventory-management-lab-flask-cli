@@ -36,7 +36,7 @@ def mock_api_server():
         m.get(f"{BASE_URL}/99", json={"error": "Not Found"}, status_code=404)
 
         # Mock successful POST response
-        m.post(BASE_URL, json={"id": 3, "name": "Test", "price": 10.0, "stock": 100}, status_code=201)
+        m.post(BASE_URL, json={"id": 3, "name": "Test", "price": 10, "stock": 100}, status_code=201)
 
         # Mock successful DELETE response
         m.delete(f"{BASE_URL}/5", text='', status_code=204)
@@ -52,7 +52,7 @@ def mock_requests_post(mock_api_server):
         mock_response = MagicMock()
         mock_response.status_code = 201
         # The .json() method should return the expected data
-        mock_response.json.return_value = {"id": 3, "name": "TestItem", "price": 10.0, "stock": 100}
+        mock_response.json.return_value = {"id": 3, "name": "TestItem", "price": 10, "stock": 100}
         mock_response.raise_for_status.return_value = None # Assume success
         mock.return_value = mock_response
         yield mock
@@ -92,7 +92,7 @@ def test_cli_add_item_success(mock_requests_post):
     """Tests the 'add-item' command successful execution."""
     captured_output = StringIO()
     sys.stdout = captured_output
-    sys.argv = ['main.py', 'add-item', 'TestItem', '10.00', '100']
+    sys.argv = ['main.py', 'add-item', 'TestItem', '10', '100']
 
     main()
     sys.stdout = sys.__stdout__ # Restore stdout
@@ -167,3 +167,9 @@ def test_cli_find_item_success(mock_api_server):
 
     assert result.returncode == 0
     assert "fetched and added item" in result.stdout
+
+def test_cli_find_item_failure(mock_api_server):
+    mock_api_server.post(f"https://world.openfoodfacts.net/api/v2/product/3017624010701?fields=product_name,nutriscore_data", status_code=400)
+    result = run_cli_command(["find-item", "301762482094"])
+
+    assert "ERROR: Barcode" in result.stdout

@@ -4,14 +4,14 @@ from .utils import load_data, save_data
 
 app = Flask(__name__)
 
-inventory = load_data()
-
 @app.route("/inventory", methods=["GET"])
 def welcome():
+    inventory = load_data()
     return jsonify(inventory), 200
 
 @app.route("/inventory/<int:id>", methods=["GET"])
 def display(id):
+    inventory = load_data()
     item = next((i for i in inventory if i['id'] == id), None)
     if item:
         return jsonify(item), 200
@@ -20,6 +20,7 @@ def display(id):
 
 @app.route("/inventory", methods=["POST"])
 def add_item():
+    inventory = load_data()
     data = request.get_json()
     if not all(k in data for k in ["name", "price", "stock"]):
          return jsonify({"error": "Missing required fields"}), 400
@@ -34,6 +35,7 @@ def add_item():
 
 @app.route("/inventory/<int:id>", methods=["PATCH"])
 def update_item(id):
+    inventory = load_data()
     data = request.get_json()
     item = next((i for i in inventory if i['id'] == id), None)
     if not item:
@@ -46,7 +48,7 @@ def update_item(id):
 
 @app.route("/inventory/<int:id>", methods=["DELETE"])
 def delete_item(id):
-    global inventory
+    inventory = load_data()
     item_index = next((i for i, item in enumerate(inventory) if item['id'] == id), None)
     if item_index is None:
         return jsonify({"error": "Item not found"}), 404
